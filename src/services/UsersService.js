@@ -61,14 +61,19 @@ const createUser = async (userData) => {
   return { token };
 };
 
+const getUsers = async () => {
+  const users = await Users.findAll({ attributes: { exclude: ['password'] } });
+  return users;
+};
+
 const getUserById = async (id) => {
-  const user = await Users.findOne({ where: { id } });
+  const user = await Users.findOne({ where: { id }, attributes: { exclude: ['password'] } });
   if (!user) return { code: 404, error: 'User does not exist' };
-  const { password, ...userWithouPwd } = user.dataValues;
-  return userWithouPwd;
+  return user;
 };
 
 module.exports = {
   createUser,
+  getUsers,
   getUserById,
 };
