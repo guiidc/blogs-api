@@ -61,6 +61,14 @@ const createUser = async (userData) => {
   return { token };
 };
 
+const getUserById = async (id) => {
+  const user = await Users.findOne({ where: { id } });
+  if (!user) return { code: 404, error: 'User does not exist' };
+  const { password, ...userWithouPwd } = user.dataValues;
+  return userWithouPwd;
+};
+
 module.exports = {
   createUser,
+  getUserById,
 };
