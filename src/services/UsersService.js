@@ -1,6 +1,5 @@
 const validator = require('validator');
 const jwt = require('jsonwebtoken');
-const bcryptjs = require('bcryptjs');
 require('dotenv').config();
 const { Users } = require('../models');
 
@@ -46,24 +45,19 @@ const validations = async (userData) => {
   validatePassword(password);
 };
 
-const genPasswordHash = (password) => {
-  const salt = bcryptjs.genSaltSync();
-  const pwdHash = bcryptjs.hashSync(password, salt);
-  return pwdHash;
-};
-
 const createUser = async (userData) => {
   const { displayName, email, password, image } = userData;
   await validations(userData);
   if (errors.length) return errors[0];
-  const passwordHash = genPasswordHash(password);
+
+  const user = await Users.create({ displayName, email, password, image });
+  const { id } = user.dataValues;
 
   const token = jwt.sign(
-  { payload: { displayName, email, password: passwordHash } },
-  process.env.JWT_SECRET,
+    { payload: { id, email } },
+    process.env.JWT_SECRET,
   );
 
-  await Users.create({ displayName, email, password: passwordHash, image });
   return { token };
 };
 
