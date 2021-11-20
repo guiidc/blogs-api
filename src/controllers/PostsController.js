@@ -9,12 +9,19 @@ const createPost = async (req, res) => {
 };
 
 const getPosts = async (req, res) => {
-  // const token = req.header.authorization;
   const posts = await PostsService.getPosts();
   res.status(200).json(posts);
+};
+
+const getPostById = async (req, res) => {
+  const { id } = req.params;
+  const post = await PostsService.getPostById(id);
+  if (post.error) return res.status(post.code).json({ message: post.error });
+  res.status(200).json(post);
 };
 
 module.exports = {
   createPost,
   getPosts,
+  getPostById,
 };
