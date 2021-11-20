@@ -1,7 +1,7 @@
 const { Op } = require('sequelize');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
-const { BlogPosts, Categories } = require('../models');
+const { BlogPosts, Categories, Users } = require('../models');
 
 let errors = [];
 
@@ -19,6 +19,10 @@ const validateCategories = async (categoryIds) => {
   }
 };
 
+const insertCategories = async (post, categoryIds) => {
+  await post.addCategories(categoryIds);
+};
+
 const createPost = async (token, title, content, categoryIds) => {
   validateData(title, content, categoryIds);
   if (errors.length) return errors[0];
@@ -26,9 +30,27 @@ const createPost = async (token, title, content, categoryIds) => {
   if (errors.length) return errors[0];
   const { id: userId } = jwt.verify(token, process.env.JWT_SECRET).payload;
   const post = await BlogPosts.create({ userId, title, content });
+  insertCategories(post, categoryIds);
   return post;
+};
+
+const getPosts = async () => {
+  const posts = await BlogPosts.findAll({
+      include: [
+        { model: Users,
+          as: 'user',
+          attributes: { exclude: ['password'] },
+        },
+        { model: Categories,
+          as: 'categories',
+          through: { attributes: [] },
+        }],
+    });
+
+  return posts;
 };
 
 module.exports = {
   createPost,
+  getPosts,
 };
