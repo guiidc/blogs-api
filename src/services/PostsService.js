@@ -94,9 +94,29 @@ const updatePost = async (postData) => {
   return newPost;
 };
 
+const validateDataToRemove = async (id, userId) => {
+  errors = [];
+  const post = await BlogPosts.findByPk(id);
+  if (!post) {
+    errors.push({ code: 404, error: 'Post does not exist' });
+    return;
+  }
+  const { userId: ownerId } = post.dataValues;
+  if (ownerId !== userId) errors.push({ code: 401, error: 'Unauthorized user' });
+};
+
+const removePost = async (token, id) => {
+  const { id: userId } = jwt.verify(token, process.env.JWT_SECRET).payload;
+  await validateDataToRemove(id, userId);
+  if (errors.length) return errors[0];
+  const post = await BlogPosts.destroy({ where: { id } });
+  return post;
+};
+
 module.exports = {
   createPost,
   getPosts,
   getPostById,
   updatePost,
+  removePost,
 };

@@ -29,9 +29,18 @@ const updatePost = async (req, res) => {
   res.status(200).json(post);
 };
 
+const removePost = async (req, res) => {
+  const { id } = req.params;
+  const token = req.headers.authorization;
+  const post = await PostsService.removePost(token, id);
+  if (post.error) return res.status(post.code).json({ message: post.error });
+  res.status(204).json();
+};
+
 module.exports = {
   createPost,
   getPosts,
   getPostById,
   updatePost,
+  removePost,
 };
