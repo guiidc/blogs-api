@@ -20,8 +20,18 @@ const getPostById = async (req, res) => {
   res.status(200).json(post);
 };
 
+const updatePost = async (req, res) => {
+  const { id } = req.params;
+  const { title, content, categoryIds } = req.body;
+  const token = req.headers.authorization;
+  const post = await PostsService.updatePost({ token, id, title, content, categoryIds });
+  if (post.error) return res.status(post.code).json({ message: post.error });
+  res.status(200).json(post);
+};
+
 module.exports = {
   createPost,
   getPosts,
   getPostById,
+  updatePost,
 };
