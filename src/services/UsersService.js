@@ -72,8 +72,15 @@ const getUserById = async (id) => {
   return user;
 };
 
+const removeMe = async (token) => {
+  const { id } = jwt.verify(token, process.env.JWT_SECRET).payload;
+  console.log('eu sou o id', id);
+  await Users.destroy({ where: { id } });
+};
+
 module.exports = {
   createUser,
   getUsers,
   getUserById,
+  removeMe,
 };

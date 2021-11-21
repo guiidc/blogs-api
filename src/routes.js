@@ -13,9 +13,11 @@ router.post('/login', LoginController.login);
 router.post('/categories', validateToken, CategoriesController.createCategory);
 router.get('/categories', validateToken, CategoriesController.getCategories);
 router.post('/post', validateToken, PostsController.createPost);
+router.get('/post/search', validateToken, PostsController.searchPosts);
 router.get('/post', validateToken, PostsController.getPosts);
 router.get('/post/:id', validateToken, PostsController.getPostById);
 router.put('/post/:id', validateToken, PostsController.updatePost);
 router.delete('/post/:id', validateToken, PostsController.removePost);
+router.delete('/user/me', validateToken, UsersController.removeMe);
 
 module.exports = router;

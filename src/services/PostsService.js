@@ -113,10 +113,32 @@ const removePost = async (token, id) => {
   return post;
 };
 
+const searchPosts = async (query) => {
+  let term;
+  if (!query) {
+    term = '';
+  } else {
+    term = query;
+  }
+  const posts = await BlogPosts.findAll({ where: {
+    [Op.or]: [
+      { title: { [Op.like]: `%${term}%` } },
+      { content: { [Op.like]: `%${term}%` } },
+    ] },
+    include: [
+      { model: Users, as: 'user', attributes: { exclude: ['password'] } },
+      { model: Categories, as: 'categories', through: { attributes: [] } },
+    ],
+  });
+
+  return posts;
+};
+
 module.exports = {
   createPost,
   getPosts,
   getPostById,
   updatePost,
   removePost,
+  searchPosts,
 };
